@@ -1,0 +1,43 @@
+{
+    "folders": [
+        {
+            "name": "Frontend",
+            "path": "./terrier-client"
+        },
+        {
+            "name": "Backend",
+            "path": "./terrier-backend"
+        }
+    ],
+    "extensions": {
+        "recommendations": [
+            "typescriptteam.native-preview",
+            "tauri-apps.tauri-vscode",
+            "svelte.svelte-vscode",
+            "bradlc.vscode-tailwindcss",
+            "rust-lang.rust-analyzer",
+            "oxc.oxc-vscode",
+            "biomejs.biome"
+        ]
+    },
+    "settings": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "always"
+        },
+        "svelte.enable-ts-plugin": true,
+        "typescript.experimental.useTsgo": true,
+        "oxc.enable": true,
+        "[javascript]": {
+            "editor.defaultFormatter": "biomejs.biome"
+        },
+        "[typescript]": {
+            "editor.defaultFormatter": "biomejs.biome"
+        },
+        "[json]": {
+            "editor.defaultFormatter": "biomejs.biome"
+        },
+        // Agrees with .editorconfig, but needed for some reason
+        "files.insertFinalNewline": true
+    }
+}
