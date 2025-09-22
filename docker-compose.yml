@@ -15,6 +15,21 @@ services:
             timeout: 5s
             retries: 5
 
+    pgadmin:
+        image: dpage/pgadmin4:latest
+        environment:
+            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@terrier.local}
+            PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+            PGADMIN_CONFIG_SERVER_MODE: 'False'
+        volumes:
+            - pgadmin_data:/var/lib/pgadmin
+        ports:
+            - "8080:80"
+        depends_on:
+            postgres:
+                condition: service_healthy
+        restart: unless-stopped
+
     migration:
         build:
             context: ./terrier-backend
@@ -76,4 +91,5 @@ services:
 
 volumes:
     postgres_data:
+    pgadmin_data:
     minio_data:

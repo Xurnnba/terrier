@@ -21,8 +21,7 @@ cp .env.example .env
 ### 2. Configure
 
 ```bash
-# Generate secure passwords for PosgreSQL and MinIO
-openssl rand -base64 32
+# Generate secure passwords for PosgreSQL, pgAdmin, and MinIO
 openssl rand -base64 32
 ```
 
@@ -66,6 +65,8 @@ make help      # Show all available commands
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `POSTGRES_PASSWORD` | Yes | Database password |
+| `PGADMIN_EMAIL` | No | pgAdmin admin email (default: <admin@terrier.local>) |
+| `PGADMIN_PASSWORD` | Yes | pgAdmin admin password |
 | `MINIO_ROOT_USER` | No | MinIO admin username (default: minioadmin) |
 | `MINIO_ROOT_PASSWORD` | Yes | MinIO admin password |
 | `S3_BUCKET_NAME` | No | Storage bucket name (default: terrier-files) |
@@ -73,11 +74,11 @@ make help      # Show all available commands
 | `OIDC_CLIENT_SECRET` | Yes | OAuth client secret |
 | `OIDC_DISCOVERY_URL` | Yes | OIDC discovery endpoint |
 | `ADMIN_EMAILS` | Yes | Comma-separated admin emails |
-| `RUST_LOG` | No | Logging level (debug, info, warn, error) |
+| `RUST_LOG` | No | Logging level [debug, info, warn, error] (default: info) |
 
 ### Volumes
 
-The platform uses PostgreSQL. Data is persisted in a Docker volume called `postgres_data`. The storage bucket uses MinIO, with data in the `minio_data` volume.
+The platform uses PostgreSQL. Data is persisted in a Docker volume called `postgres_data`, and pgAdmin data is in the `pgadmin_data` volume. The storage bucket uses MinIO, with data in the `minio_data` volume.
 
 ### Logs
 
