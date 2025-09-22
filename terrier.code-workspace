@@ -37,6 +37,9 @@
         "[json]": {
             "editor.defaultFormatter": "biomejs.biome"
         },
+        "[svelte]": {
+            "editor.defaultFormatter": "biomejs.biome"
+        },
         // Agrees with .editorconfig, but needed for some reason
         "files.insertFinalNewline": true
     }
