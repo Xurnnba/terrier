@@ -22,7 +22,7 @@ cp .env.example .env
 
 ```bash
 # Generate secure passwords for PosgreSQL, pgAdmin, and MinIO
-openssl rand -base64 32
+python3 -c "import secrets; print(secrets.token_urlsafe(32))"
 ```
 
 Modify `.env` with these values, your OIDC credentials, and admin emails (comma-separated).
@@ -45,6 +45,7 @@ Most OIDC providers follow similar patterns. You need:
 ## Available Commands
 
 ```bash
+make help      # Show all available commands
 make build     # Build all services
 make up        # Start all services
 make down      # Stop all services
@@ -55,7 +56,7 @@ make logs      # Show logs for all services
 make clean     # Remove all containers, volumes, and images
 make restart   # Restart all services
 make setup     # Run migrations and start services
-make help      # Show all available commands
+make dev       # Start supporting services, run migrations, and launch backend locally
 ```
 
 ## Configuration

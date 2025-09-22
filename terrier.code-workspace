@@ -28,6 +28,11 @@
         "editor.codeActionsOnSave": {
             "source.organizeImports": "always"
         },
+        "rust-analyzer.linkedProjects": [
+            "terrier-backend/Cargo.toml",
+            "terrier-backend/migration/Cargo.toml",
+            "terrier-client/src-tauri/Cargo.toml",
+        ],
         "svelte.enable-ts-plugin": true,
         "typescript.experimental.useTsgo": true,
         "oxc.enable": true,

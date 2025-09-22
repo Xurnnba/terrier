@@ -1,4 +1,4 @@
-.PHONY: build up down migrate fresh status logs clean restart setup help
+.PHONY: help build up down migrate fresh status logs clean restart setup dev
 
 help: ## Show this help message
 	@echo "Available commands:"
@@ -31,3 +31,8 @@ clean: ## Remove all containers, volumes, and images
 restart: down up ## Restart all services
 
 setup: migrate up ## Run migrations and start services
+
+dev: ## Start supporting services, run migrations, and launch backend locally
+	docker-compose up -d postgres minio pgadmin
+	cd terrier-backend/migration && cargo run
+	cd terrier-backend && cargo run

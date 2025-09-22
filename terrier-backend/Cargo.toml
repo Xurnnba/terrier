@@ -5,15 +5,18 @@ edition = "2024"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-axum = "0.8.4"
-axum-login = "0.18.0"
+axum = { version = "0.8.4", features = ["macros"] }
+axum-oidc = "0.6.0"
 dotenvy = "0.15.7"
+minio = "0.3.0"
 sea-orm = { version = "1.1.16", features = [
     "sqlx-postgres",
     "runtime-tokio-rustls",
     "macros",
 ] }
+serde = { version = "1.0.226", features = ["derive"] }
 tokio = { version = "1.47.1", features = ["full"] }
-utoipa = { version = "5.4.0", features = ["axum_extras"] }
+utoipa = { version = "5.4.0", features = ["axum_extras", "chrono", "uuid"] }
 utoipa-axum = "0.2.0"
 utoipa-swagger-ui = { version = "9.0.2", features = ["axum"] }
+uuid = { version = "1.18.1", features = ["v4"] }
