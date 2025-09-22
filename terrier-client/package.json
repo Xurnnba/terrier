@@ -23,11 +23,13 @@
         ]
     },
     "lint-staged": {
-        "**/*.{js,mjs,cjs,jsx,ts,mts,cts,tsx,vue,astro,svelte}": [
-            "bun lint"
-        ],
-        "*": [
+        "**/*.{js,ts,svelte}": [
+            "bun lint",
             "bun format"
+        ],
+        "**/*.rs": [
+            "cargo clippy --workspace --all-targets -- -D warnings",
+            "cargo fmt --all -- --check"
         ]
     },
     "dependencies": {

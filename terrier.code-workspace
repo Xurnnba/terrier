@@ -1,6 +1,9 @@
 {
     "folders": [
         {
+            "path": "."
+        },
+        {
             "name": "Frontend",
             "path": "./terrier-client"
         },
