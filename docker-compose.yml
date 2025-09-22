@@ -27,15 +27,42 @@ services:
         command: ["migration"] # Runs all pending migrations
         profiles: ["migration"]
 
+    minio:
+        image: minio/minio:latest
+        command: server /data --console-address ":9001"
+        environment:
+            MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+            MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+        ports:
+            - "9000:9000" # API
+            - "9001:9001" # Web Console
+        volumes:
+            - minio_data:/data
+        healthcheck:
+            test: ["CMD", "mc", "ready", "local"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+        restart: unless-stopped
+
     backend:
         build:
             context: ./terrier-backend
             dockerfile: Dockerfile
         environment:
+            # Database Configuration
             DATABASE_URL: postgres://terrier:${POSTGRES_PASSWORD}@postgres:5432/terrier
+            # S3/MinIO Configuration
+            S3_ENDPOINT: http://minio:9000
+            S3_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+            S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+            S3_BUCKET_NAME: ${S3_BUCKET_NAME:-terrier-files}
+            S3_REGION: us-east-1
+            # OIDC Configuration
             OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
             OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
             OIDC_DISCOVERY_URL: ${OIDC_DISCOVERY_URL}
+            # Admin Configuration
             ADMIN_EMAILS: ${ADMIN_EMAILS}
             RUST_LOG: ${RUST_LOG:-info}
         ports:
@@ -43,7 +70,10 @@ services:
         depends_on:
             postgres:
                 condition: service_healthy
+            minio:
+                condition: service_healthy
         restart: unless-stopped
 
 volumes:
     postgres_data:
+    minio_data:

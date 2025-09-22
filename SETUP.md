@@ -20,22 +20,13 @@ cp .env.example .env
 
 ### 2. Configure
 
-Edit `.env` with your OIDC credentials:
-
 ```bash
-# Database
-POSTGRES_PASSWORD=secure_password
-
-# OIDC configuration
-OIDC_CLIENT_ID=client_id
-OIDC_CLIENT_SECRET=client_secret
-OIDC_DISCOVERY_URL=https://accounts.google.com/.well-known/openid_configuration
-
-# Admin configuration
-ADMIN_EMAILS=admin@acme.com
-
-RUST_LOG=info
+# Generate secure passwords for PosgreSQL and MinIO
+openssl rand -base64 32
+openssl rand -base64 32
 ```
+
+Modify `.env` with these values, your OIDC credentials, and admin emails (comma-separated).
 
 ### 3. Start
 
@@ -75,15 +66,18 @@ make help      # Show all available commands
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `POSTGRES_PASSWORD` | Yes | Database password |
+| `MINIO_ROOT_USER` | No | MinIO admin username (default: minioadmin) |
+| `MINIO_ROOT_PASSWORD` | Yes | MinIO admin password |
+| `S3_BUCKET_NAME` | No | Storage bucket name (default: terrier-files) |
 | `OIDC_CLIENT_ID` | Yes | OAuth client ID |
 | `OIDC_CLIENT_SECRET` | Yes | OAuth client secret |
 | `OIDC_DISCOVERY_URL` | Yes | OIDC discovery endpoint |
 | `ADMIN_EMAILS` | Yes | Comma-separated admin emails |
 | `RUST_LOG` | No | Logging level (debug, info, warn, error) |
 
-### Database
+### Volumes
 
-The platform uses PostgreSQL. Data is persisted in a Docker volume called `postgres_data`.
+The platform uses PostgreSQL. Data is persisted in a Docker volume called `postgres_data`. The storage bucket uses MinIO, with data in the `minio_data` volume.
 
 ### Logs
 
@@ -96,4 +90,7 @@ docker-compose logs -f backend
 
 # Database only
 docker-compose logs -f postgres
+
+# Bucket only
+docker-compose logs -f minio
 ```
