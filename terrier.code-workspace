@@ -28,6 +28,12 @@
         "editor.codeActionsOnSave": {
             "source.organizeImports": "always"
         },
+        "files.readonlyInclude": {
+            "**/bun.lock": true,
+            "**/Cargo.lock": true,
+            "**/src/entities/*": true,
+        },
+        "biome.lsp.bin": "terrier-client/node_modules/.bin/biome",
         "rust-analyzer.linkedProjects": [
             "terrier-backend/Cargo.toml",
             "terrier-backend/migration/Cargo.toml",
@@ -35,6 +41,7 @@
         ],
         "svelte.enable-ts-plugin": true,
         "typescript.experimental.useTsgo": true,
+        "typescript.preferences.importModuleSpecifier": "non-relative",
         "oxc.enable": true,
         "[javascript]": {
             "editor.defaultFormatter": "biomejs.biome"
