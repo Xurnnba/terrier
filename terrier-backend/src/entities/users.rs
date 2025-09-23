@@ -19,8 +19,8 @@ pub struct Model {
     #[sea_orm(column_type = "Text", nullable)]
     pub picture: Option<String>,
     pub oidc_issuer: String,
-    pub created_at: DateTimeWithTimeZone,
-    pub updated_at: DateTimeWithTimeZone,
+    pub created_at: DateTime,
+    pub updated_at: DateTime,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
