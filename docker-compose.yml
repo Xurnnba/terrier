@@ -10,7 +10,7 @@ services:
         ports:
             - "5432:5432"
         healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U terrier"]
+            test: [ "CMD-SHELL", "pg_isready -U terrier" ]
             interval: 10s
             timeout: 5s
             retries: 5
@@ -39,8 +39,8 @@ services:
         depends_on:
             postgres:
                 condition: service_healthy
-        command: ["migration"] # Runs all pending migrations
-        profiles: ["migration"]
+        command: [ "migration" ] # Runs all pending migrations
+        profiles: [ "migration" ]
 
     minio:
         image: minio/minio:latest
@@ -54,7 +54,7 @@ services:
         volumes:
             - minio_data:/data
         healthcheck:
-            test: ["CMD", "mc", "ready", "local"]
+            test: [ "CMD", "mc", "ready", "local" ]
             interval: 5s
             timeout: 5s
             retries: 5
@@ -87,6 +87,26 @@ services:
                 condition: service_healthy
             minio:
                 condition: service_healthy
+        healthcheck:
+            test: [ "CMD", "curl", "-f", "http://localhost:3000/health" ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        restart: unless-stopped
+
+    frontend:
+        build:
+            context: ./terrier-client
+            dockerfile: Dockerfile
+        environment:
+            VITE_API_URL: http://localhost:3000
+            NODE_ENV: production
+        ports:
+            - "1420:80"
+        depends_on:
+            backend:
+                # Just get it to start, don't wait for healthcheck
+                condition: service_started
         restart: unless-stopped
 
 volumes:

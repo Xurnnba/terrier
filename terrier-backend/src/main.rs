@@ -69,7 +69,11 @@ pub async fn create_app(app_state: AppState) -> Result<Router, BoxError> {
         // OIDC authentication layer
         .layer(oidc_login_service)
         // Public routes
-        .route("/", get(|| async { "Terrier API" }))
+        .route(
+            "/",
+            get(|| async { "Visit /swagger for API documentation" }),
+        )
+        .route("/health", get(|| async { "OK" }))
         .merge(SwaggerUi::new("/swagger").url("/openapi.json", ApiDoc::openapi()))
         // Middleware layers
         .layer(oidc_auth_service)
