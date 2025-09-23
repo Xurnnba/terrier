@@ -30,8 +30,8 @@ Modify `.env` with these values, your OIDC credentials, and admin emails (comma-
 ### 3. Start
 
 ```bash
-make setup    # Runs migrations and starts services
-make logs     # View logs
+just setup   # Runs migrations and starts services
+just logs    # View logs
 ```
 
 ## Setting Up OIDC Providers
@@ -39,24 +39,24 @@ make logs     # View logs
 Most OIDC providers follow similar patterns. You need:
 
 - Client ID and Secret
-- Discovery URL (usually `https://provider.com/.well-known/openid-configuration`)
-- Callback URL pointing to the backend
+- Issuer URL
+- Callback URL pointing to the backend (`/auth/callback`)
 
 ## Available Commands
 
 ```bash
-make help      # Show all available commands
-make build     # Build all services
-make up        # Start all services
-make down      # Stop all services
-make migrate   # Run database migrations
-make fresh     # Fresh database (drop all tables and reapply migrations)
-make status    # Check migration status
-make logs      # Show logs for all services
-make clean     # Remove all containers, volumes, and images
-make restart   # Restart all services
-make setup     # Run migrations and start services
-make dev       # Start supporting services, run migrations, and launch backend locally
+just build   # Build all services
+just clean   # Remove all containers, volumes, and images
+just dev     # Start supporting services, run migrations, and launch apps locally
+just down    # Stop all services
+just fresh   # Fresh database (drop all tables and reapply migrations)
+just help    # Show this help message
+just logs    # Show logs for all services
+just migrate # Run database migrations
+just restart # Restart all services
+just setup   # Run migrations and start services
+just status  # Check migration status
+just up      # Start all services
 ```
 
 ## Configuration
@@ -85,7 +85,7 @@ The platform uses PostgreSQL. Data is persisted in a Docker volume called `postg
 
 ```bash
 # All
-make logs
+just logs
 
 # Backend only
 docker-compose logs -f backend
