@@ -1,6 +1,7 @@
 #[derive(Clone, Debug)]
 pub struct Config {
     pub app_url: String,
+    pub api_url: String,
     pub database_url: String,
     pub oidc_issuer: String,
     pub oidc_client_id: String,
@@ -21,6 +22,7 @@ impl Config {
 
         Ok(Config {
             app_url: dotenvy::var("APP_URL")?,
+            api_url: dotenvy::var("API_URL")?,
             database_url: dotenvy::var("DATABASE_URL")?,
             oidc_issuer: dotenvy::var("OIDC_ISSUER")?,
             oidc_client_id: dotenvy::var("OIDC_CLIENT_ID")?,

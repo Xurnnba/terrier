@@ -39,6 +39,9 @@ clean:
 # Restart all services
 restart: down up
 
+# Restart with rebuild (for code changes)
+restart-build: down build up
+
 # Run migrations and start services
 setup: migrate up
 

@@ -1,5 +1,6 @@
 services:
     postgres:
+        container_name: postgres
         image: postgres:17
         environment:
             POSTGRES_DB: terrier
@@ -16,6 +17,7 @@ services:
             retries: 5
 
     pgadmin:
+        container_name: pgadmin
         image: dpage/pgadmin4:latest
         environment:
             PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@terrier.local}
@@ -44,6 +46,7 @@ services:
         profiles: [ "migration" ]
 
     minio:
+        container_name: minio
         image: minio/minio:latest
         command: server /data --console-address ":9001"
         environment:
@@ -62,10 +65,14 @@ services:
         restart: unless-stopped
 
     backend:
+        container_name: backend
         build:
             context: ./terrier-backend
             dockerfile: Dockerfile
         environment:
+            # Application Configuration
+            APP_URL: ${APP_URL:-http://localhost:1420}
+            API_URL: ${API_URL:-http://localhost:3000}
             # Database Configuration
             DATABASE_URL: postgres://terrier:${POSTGRES_PASSWORD}@postgres:5432/terrier
             # S3/MinIO Configuration
@@ -75,7 +82,7 @@ services:
             S3_BUCKET_NAME: ${S3_BUCKET_NAME:-terrier-files}
             S3_REGION: us-east-1
             # OIDC Configuration
-            OIDC_ISSUSER: ${OIDC_ISSUER}
+            OIDC_ISSUER: ${OIDC_ISSUER}
             OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
             OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
             # Admin Configuration
@@ -96,11 +103,12 @@ services:
         restart: unless-stopped
 
     frontend:
+        container_name: frontend
         build:
             context: ./terrier-client
             dockerfile: Dockerfile
         environment:
-            VITE_API_URL: http://localhost:3000
+            VITE_API_URL: ${API_URL:-http://localhost:3000}
             NODE_ENV: production
         ports:
             - "1420:80"
@@ -112,5 +120,8 @@ services:
 
 volumes:
     postgres_data:
+        name: postgres_data
     pgadmin_data:
+        name: pgadmin_data
     minio_data:
+        name: minio_data

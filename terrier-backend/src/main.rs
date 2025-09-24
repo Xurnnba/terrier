@@ -52,7 +52,7 @@ pub async fn create_app(app_state: AppState) -> Result<Router, BoxError> {
         }))
         .layer(
             OidcAuthLayer::<EmptyAdditionalClaims>::discover_client(
-                Uri::from_maybe_shared(config.app_url).expect("valid APP_URL"),
+                Uri::from_maybe_shared(config.api_url).expect("valid API_URL"),
                 config.oidc_issuer,
                 config.oidc_client_id,
                 Some(config.oidc_client_secret),
