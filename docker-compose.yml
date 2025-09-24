@@ -75,9 +75,9 @@ services:
             S3_BUCKET_NAME: ${S3_BUCKET_NAME:-terrier-files}
             S3_REGION: us-east-1
             # OIDC Configuration
+            OIDC_ISSUSER: ${OIDC_ISSUER}
             OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
             OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
-            OIDC_DISCOVERY_URL: ${OIDC_DISCOVERY_URL}
             # Admin Configuration
             ADMIN_EMAILS: ${ADMIN_EMAILS}
             RUST_LOG: ${RUST_LOG:-info}
