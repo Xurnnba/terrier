@@ -32,6 +32,7 @@
             "**/bun.lock": true,
             "**/Cargo.lock": true,
             "**/src/entities/*": true,
+            "**/src/lib/schema.d.ts": true
         },
         "biome.lsp.bin": "terrier-client/node_modules/.bin/biome",
         "rust-analyzer.linkedProjects": [
@@ -53,7 +54,7 @@
             "editor.defaultFormatter": "biomejs.biome"
         },
         "[svelte]": {
-            "editor.defaultFormatter": "biomejs.biome"
+            "editor.defaultFormatter": "svelte.svelte-vscode"
         },
         // Agrees with .editorconfig, but needed for some reason
         "files.insertFinalNewline": true
