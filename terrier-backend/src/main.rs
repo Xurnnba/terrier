@@ -5,7 +5,10 @@ use axum::{
     response::IntoResponse,
     routing::{get, post},
 };
-use axum_oidc::{EmptyAdditionalClaims, OidcAuthLayer, OidcLoginLayer, error::MiddlewareError};
+use axum_oidc::{
+    EmptyAdditionalClaims, OidcAuthLayer, OidcClient, OidcLoginLayer, error::MiddlewareError,
+    handle_oidc_redirect,
+};
 use sea_orm::DatabaseConnection;
 use tokio::signal;
 use tower::ServiceBuilder;
@@ -46,21 +49,24 @@ pub async fn create_app(app_state: AppState) -> Result<Router, BoxError> {
         .layer(OidcLoginLayer::<EmptyAdditionalClaims>::new());
 
     let config = app_state.config.clone();
+    let redirect_url = format!("{}/auth/callback", config.api_url);
+
+    let oidc_client = OidcClient::<EmptyAdditionalClaims>::builder()
+        .with_default_http_client()
+        .with_redirect_url(Uri::try_from(redirect_url).expect("valid API_URL"))
+        .with_client_id(config.oidc_client_id)
+        .with_client_secret(config.oidc_client_secret)
+        .with_scopes(["openid", "email", "profile"].into_iter())
+        .discover(config.oidc_issuer)
+        .await
+        .unwrap()
+        .build();
+
     let oidc_auth_service = ServiceBuilder::new()
         .layer(HandleErrorLayer::new(|e: MiddlewareError| async {
             e.into_response()
         }))
-        .layer(
-            OidcAuthLayer::<EmptyAdditionalClaims>::discover_client(
-                Uri::from_maybe_shared(config.api_url).expect("valid API_URL"),
-                config.oidc_issuer,
-                config.oidc_client_id,
-                Some(config.oidc_client_secret),
-                vec!["openid".into(), "email".into(), "profile".into()],
-            )
-            .await
-            .unwrap(),
-        );
+        .layer(OidcAuthLayer::new(oidc_client));
 
     let router = Router::new()
         // Protected routes
@@ -69,6 +75,10 @@ pub async fn create_app(app_state: AppState) -> Result<Router, BoxError> {
         // OIDC authentication layer
         .layer(oidc_login_service)
         // Public routes
+        .route(
+            "/auth/callback",
+            get(handle_oidc_redirect::<EmptyAdditionalClaims>),
+        )
         .route(
             "/",
             get(|| async { "Visit /swagger for API documentation" }),
