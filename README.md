@@ -11,3 +11,5 @@ This project uses `just`, a make-like command runner. After [installing it](http
 ```bash
 just dev
 ```
+
+Then visit `http://localhost:8080` in the browser.

@@ -47,7 +47,7 @@ setup: migrate up
 
 # Start supporting services, run migrations, and launch apps locally
 dev:
-    docker-compose up -d postgres minio pgadmin
+    docker-compose up -d postgres minio pgadmin nginx-dev
     cd terrier-backend/migration && cargo run
     cd terrier-backend && cargo run &
     cd terrier-client && bun run dev
