@@ -34,6 +34,7 @@
             "**/src/entities/*": true,
             "**/src/lib/schema.d.ts": true
         },
+        "biome.enabled": false, // Agrees with biome.jsonc, but needed for some reason
         "biome.lsp.bin": "terrier-client/node_modules/.bin/biome",
         "rust-analyzer.linkedProjects": [
             "terrier-backend/Cargo.toml",
@@ -56,7 +57,6 @@
         "[svelte]": {
             "editor.defaultFormatter": "svelte.svelte-vscode"
         },
-        // Agrees with .editorconfig, but needed for some reason
-        "files.insertFinalNewline": true
+        "files.insertFinalNewline": true // Agrees with .editorconfig, but needed for some reason
     }
 }

@@ -1,6 +1,6 @@
 <script lang="ts">
 </script>
 
-<main>
+<div>
     <p class="font-bold">Hello world</p>
-</main>
+</div>
