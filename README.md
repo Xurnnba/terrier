@@ -12,4 +12,4 @@ This project uses `just`, a make-like command runner. After [installing it](http
 just dev
 ```
 
-Then visit `http://localhost:8080` in the browser.
+Then visit [http://localhost:8080](http://localhost:8080) in the browser.
