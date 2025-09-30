@@ -21,6 +21,7 @@ pub struct Model {
     pub oidc_issuer: String,
     pub created_at: DateTime,
     pub updated_at: DateTime,
+    pub role: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

@@ -1,9 +1,6 @@
 use axum::{
-    BoxError, Router,
-    error_handling::HandleErrorLayer,
-    http::Uri,
-    response::IntoResponse,
-    routing::{get, post},
+    BoxError, Router, error_handling::HandleErrorLayer, http::Uri, middleware,
+    response::IntoResponse, routing::get,
 };
 use axum_oidc::{
     EmptyAdditionalClaims, OidcAuthLayer, OidcClient, OidcLoginLayer, error::MiddlewareError,
@@ -70,21 +67,26 @@ pub async fn create_app(app_state: AppState) -> Result<Router, BoxError> {
 
     let router = Router::new()
         // Protected routes
-        .route("/auth/me", get(auth::handlers::me))
-        .route("/auth/logout", post(auth::handlers::logout))
+        .route("/api/auth/login", get(auth::handlers::login))
+        .route("/api/auth/logout", get(auth::handlers::logout))
         // OIDC authentication layer
+        .layer(middleware::from_fn_with_state(
+            app_state.clone(),
+            auth::middleware::sync_user_middleware,
+        ))
         .layer(oidc_login_service)
         // Public routes
+        .route("/api/auth/status", get(auth::handlers::status))
         .route(
-            "/auth/callback",
+            "/api/auth/callback",
             get(handle_oidc_redirect::<EmptyAdditionalClaims>),
         )
         .route(
-            "/",
-            get(|| async { "Visit /swagger for API documentation" }),
+            "/api/",
+            get(|| async { "Visit /api/swagger for API documentation" }),
         )
-        .route("/health", get(|| async { "OK" }))
-        .merge(SwaggerUi::new("/swagger").url("/openapi.json", ApiDoc::openapi()))
+        .route("/api/health", get(|| async { "OK" }))
+        .merge(SwaggerUi::new("/api/swagger").url("/api/openapi.json", ApiDoc::openapi()))
         // Middleware layers
         .layer(oidc_auth_service)
         .layer(session_layer)

@@ -1,6 +1,9 @@
 <script lang="ts">
 import { page } from "$app/state";
 import "@/app.css";
+import { client } from "@/lib/api";
+import { setAuthContext } from "@/lib/auth.svelte";
+import { onMount } from "svelte";
 
 import Calendar from "@/components/icons/calendar.svelte";
 import ClipboardCheck from "@/components/icons/clipboard-check.svelte";
@@ -23,6 +26,11 @@ const navItems = [
 		href: "/dashboard",
 		label: "Dashboard",
 		icon: Home03,
+	},
+	{
+		href: "/configuration",
+		label: "Configuration",
+		icon: Tool01,
 	},
 	{
 		href: "/participants",
@@ -69,53 +77,76 @@ const navItems = [
 		label: "Application",
 		icon: File05,
 	},
-	{
-		href: "/settings",
-		label: "Settings",
-		icon: Tool01,
-	},
 ];
 
 const currentPath = $derived(page.url.pathname);
 const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+
+const auth = setAuthContext();
+
+onMount(async () => {
+	const { data, response } = await client.GET("/auth/status");
+
+	if (data && response.ok) {
+		auth.user = data;
+		auth.isLoading = false;
+	} else {
+		const appUrl = window.location.origin;
+		const fullRedirectUri = `${appUrl}${currentPath}`;
+		const encodedUri = encodeURIComponent(fullRedirectUri);
+
+		window.location.href = `${apiUrl}/auth/login?redirect_uri=${encodedUri}`;
+	}
+});
+
+const logout = () => {
+	window.location.href = `${apiUrl}/auth/logout`;
+};
 </script>
 
-<div class="min-h-screen bg-secondary text-selected flex">
-    <aside
-        class="w-64 h-[calc(100vh-3.5rem)] mt-7 ml-7 p-4 rounded-4xl shadow-lg bg-primary"
+{#if auth.isLoading}
+    <div
+        class="min-h-screen bg-secondary text-selected flex items-center justify-center"
     >
-        <a href="/" class="mt-6 justify-center gap-2 flex">
-            <ScottyLabsFilled class="my-auto" />
-            <span class="text-2xl font-medium">Terrier</span>
-        </a>
+        <p>Authenticating...</p>
+    </div>
+{:else if auth.user}
+    <div class="min-h-screen bg-secondary text-selected flex">
+        <aside
+            class="w-64 h-[calc(100vh-3.5rem)] mt-7 ml-7 p-4 rounded-4xl shadow-lg bg-primary"
+        >
+            <a href="/" class="mt-6 justify-center gap-2 flex">
+                <ScottyLabsFilled class="my-auto" />
+                <span class="text-2xl font-medium">Terrier</span>
+            </a>
 
-        <nav class="flex mt-8 flex-col gap-1">
-            {#each navItems as item}
-                <a
-                    href={item.href}
-                    class="flex gap-2.5 px-3 py-2 rounded-4xl {currentPath ===
-                    item.href
-                        ? 'bg-selected text-primary'
-                        : 'text-selected'}"
-                >
-                    <item.icon class="my-auto size-5" />
-                    <span class="font-medium">{item.label}</span>
-                </a>
-            {/each}
+            <nav class="flex mt-8 flex-col gap-1">
+                {#each navItems as item}
+                    <a
+                        href={item.href}
+                        class="flex gap-2.5 px-3 py-2 rounded-4xl {currentPath ===
+                        item.href
+                            ? 'bg-selected text-primary'
+                            : 'text-selected'}"
+                    >
+                        <item.icon class="my-auto size-5" />
+                        <span class="font-medium">{item.label}</span>
+                    </a>
+                {/each}
 
-            <form action="{apiUrl}/auth/logout" method="POST">
                 <button
                     type="submit"
+                    onclick={logout}
                     class="flex cursor-pointer gap-2.5 px-3 py-2 rounded-4xl text-selected"
                 >
                     <LogOut01 class="my-auto size-5" />
                     <span class="font-medium">Logout</span>
                 </button>
-            </form>
-        </nav>
-    </aside>
+            </nav>
+        </aside>
 
-    <main class="flex-1 p-7 overflow-y-auto">
-        {@render children()}
-    </main>
-</div>
+        <main class="flex-1 p-7 overflow-y-auto">
+            {@render children()}
+        </main>
+    </div>
+{/if}

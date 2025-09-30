@@ -4,6 +4,23 @@
  */
 
 export interface paths {
+	"/auth/login": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Initiate login flow */
+		get: operations["login"];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	"/auth/logout": {
 		parameters: {
 			query?: never;
@@ -11,17 +28,17 @@ export interface paths {
 			path?: never;
 			cookie?: never;
 		};
-		get?: never;
-		put?: never;
 		/** Log the current user out */
-		post: operations["logout"];
+		get: operations["logout"];
+		put?: never;
+		post?: never;
 		delete?: never;
 		options?: never;
 		head?: never;
 		patch?: never;
 		trace?: never;
 	};
-	"/auth/me": {
+	"/auth/status": {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -29,7 +46,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get current user information */
-		get: operations["me"];
+		get: operations["status"];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -42,6 +59,9 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
 	schemas: {
+		LoginQuery: {
+			redirect_uri?: string | null;
+		};
 		UserInfo: {
 			email?: string | null;
 			name?: string | null;
@@ -56,6 +76,27 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+	login: {
+		parameters: {
+			query?: {
+				/** @description URI to redirect to after login */
+				redirect_uri?: string;
+			};
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Redirect to app after login */
+			302: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
 	logout: {
 		parameters: {
 			query?: never;
@@ -74,7 +115,7 @@ export interface operations {
 			};
 		};
 	};
-	me: {
+	status: {
 		parameters: {
 			query?: never;
 			header?: never;

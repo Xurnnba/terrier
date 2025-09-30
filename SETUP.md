@@ -40,7 +40,7 @@ Most OIDC providers follow similar patterns. You need:
 
 - Client ID and Secret
 - Issuer URL
-- Callback URL pointing to the backend (`/auth/callback`)
+- Callback URL pointing to the backend (`/api/auth/callback`)
 
 ## Available Commands
 

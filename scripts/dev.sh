@@ -24,7 +24,7 @@ cd "$ROOT_DIR/terrier-backend"
 cargo run &
 
 echo "Waiting for backend to be ready..."
-until curl -s http://localhost:3000/openapi.json > /dev/null; do
+until curl -s http://localhost:3000/api/openapi.json > /dev/null; do
     sleep 1
 done
 echo "Backend is ready"
