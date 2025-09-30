@@ -7,19 +7,21 @@
     import { canAccessRoute } from "@/lib/permissions";
     import { onMount } from "svelte";
 
-    import Calendar from "@/components/icons/calendar.svelte";
-    import ClipboardCheck from "@/components/icons/clipboard-check.svelte";
-    import Cube01 from "@/components/icons/cube-01.svelte";
-    import File05 from "@/components/icons/file-05.svelte";
-    import Home03 from "@/components/icons/home-03.svelte";
-    import LogOut01 from "@/components/icons/log-out-01.svelte";
-    import MessageTextSquare01 from "@/components/icons/message-text-square-01.svelte";
-    import QrCode01 from "@/components/icons/qr-code-01.svelte";
-    import Scales01 from "@/components/icons/scales-01.svelte";
     import ScottyLabsFilled from "@/components/icons/ScottyLabs_filled.svelte";
-    import Tool01 from "@/components/icons/tool-01.svelte";
-    import User02 from "@/components/icons/user-02.svelte";
-    import Users01 from "@/components/icons/users-01.svelte";
+    import {
+        CalendarIcon,
+        ClipboardCheckIcon,
+        Cube01Icon,
+        File05Icon,
+        Home03Icon,
+        LogOut01Icon,
+        MessageTextSquare01Icon,
+        QrCode01Icon,
+        Scales01Icon,
+        Tool01Icon,
+        User02Icon,
+        Users01Icon,
+    } from "@untitled-theme/icons-svelte";
 
     const { children } = $props();
     const auth = setAuthContext();
@@ -28,57 +30,57 @@
         {
             href: "/dashboard",
             label: "Dashboard",
-            icon: Home03,
+            icon: Home03Icon,
         },
         {
             href: "/configuration",
             label: "Configuration",
-            icon: Tool01,
+            icon: Tool01Icon,
         },
         {
             href: "/participants",
             label: "Participants",
-            icon: Users01,
+            icon: Users01Icon,
         },
         {
             href: "/schedule",
             label: "Schedule",
-            icon: Calendar,
+            icon: CalendarIcon,
         },
         {
             href: "/messages",
             label: "Messages",
-            icon: MessageTextSquare01,
+            icon: MessageTextSquare01Icon,
         },
         {
             href: "/judging",
             label: "Judging",
-            icon: Scales01,
+            icon: Scales01Icon,
         },
         {
             href: "/results",
             label: "Results",
-            icon: ClipboardCheck,
+            icon: ClipboardCheckIcon,
         },
         {
             href: "/submission",
             label: "Project Submission",
-            icon: Cube01,
+            icon: Cube01Icon,
         },
         {
             href: "/check-in",
             label: "Event Check-In",
-            icon: QrCode01,
+            icon: QrCode01Icon,
         },
         {
             href: "/profile",
             label: "Profile",
-            icon: User02,
+            icon: User02Icon,
         },
         {
             href: "/application",
             label: "Application",
-            icon: File05,
+            icon: File05Icon,
         },
     ];
 
@@ -155,7 +157,7 @@
                     onclick={logout}
                     class="flex cursor-pointer gap-2.5 px-3 py-2 rounded-4xl text-selected"
                 >
-                    <LogOut01 class="my-auto size-5" />
+                    <LogOut01Icon class="my-auto size-5" />
                     <span class="font-medium">Logout</span>
                 </button>
             </nav>
