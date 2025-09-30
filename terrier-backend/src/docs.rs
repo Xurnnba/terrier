@@ -6,16 +6,18 @@ use utoipa::{
     },
 };
 
+use crate::{auth, entities};
+
 #[derive(OpenApi)]
 #[openapi(
     paths(
-        crate::auth::handlers::status,
-        crate::auth::handlers::login,
-        crate::auth::handlers::logout,
+        auth::handlers::status,
+        auth::handlers::login,
+        auth::handlers::logout,
     ),
     components(schemas(
-        crate::auth::handlers::LoginQuery,
-        crate::auth::handlers::UserInfo,
+        auth::handlers::LoginQuery,
+        entities::users::Model,
     )),
     modifiers(&SecurityAddon),
     tags(

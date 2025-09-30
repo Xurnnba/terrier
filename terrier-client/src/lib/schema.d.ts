@@ -62,10 +62,21 @@ export interface components {
 		LoginQuery: {
 			redirect_uri?: string | null;
 		};
-		UserInfo: {
-			email?: string | null;
+		Model: {
+			/** Format: date-time */
+			created_at: string;
+			email: string;
+			family_name?: string | null;
+			given_name?: string | null;
+			/** Format: int32 */
+			id: number;
 			name?: string | null;
-			sub: string;
+			oidc_issuer: string;
+			oidc_sub: string;
+			picture?: string | null;
+			role: string;
+			/** Format: date-time */
+			updated_at: string;
 		};
 	};
 	responses: never;
@@ -130,7 +141,7 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content: {
-					"application/json": components["schemas"]["UserInfo"];
+					"application/json": components["schemas"]["Model"];
 				};
 			};
 			/** @description Not authenticated */

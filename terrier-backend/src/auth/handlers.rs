@@ -5,44 +5,41 @@ use axum::{
     response::{IntoResponse, Redirect},
 };
 use axum_oidc::{EmptyAdditionalClaims, OidcClaims, OidcRpInitiatedLogout};
-use serde::{Deserialize, Serialize};
+use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
+use serde::Deserialize;
 use utoipa::ToSchema;
 
-use crate::AppState;
-
-#[derive(Serialize, ToSchema)]
-pub struct UserInfo {
-    pub sub: String,
-    pub email: Option<String>,
-    pub name: Option<String>,
-}
+use crate::{
+    AppState,
+    entities::{prelude::*, users},
+};
 
 /// Get current user information
 #[utoipa::path(
     get,
     path = "/auth/status",
     responses(
-        (status = 200, description = "User information", body = UserInfo),
+        (status = 200, description = "User information", body = users::Model),
         (status = 401, description = "Not authenticated")
     ),
     tag = "Authentication"
 )]
 #[axum::debug_handler]
 pub async fn status(
+    State(state): State<AppState>,
     claims: Option<OidcClaims<EmptyAdditionalClaims>>,
-) -> Result<Json<UserInfo>, StatusCode> {
+) -> Result<Json<users::Model>, StatusCode> {
     match claims {
         Some(claims) => {
-            let user_info = UserInfo {
-                sub: claims.0.subject().to_string(),
-                email: claims.0.email().map(|e| e.to_string()),
-                name: claims
-                    .0
-                    .name()
-                    .and_then(|name| name.get(None))
-                    .map(|n| n.to_string()),
-            };
-            Ok(Json(user_info))
+            let oidc_sub = claims.0.subject().to_string();
+            let user = Users::find()
+                .filter(users::Column::OidcSub.eq(&oidc_sub))
+                .one(&state.db)
+                .await
+                .ok()
+                .flatten();
+
+            user.map(Json).ok_or(StatusCode::UNAUTHORIZED)
         }
         None => Err(StatusCode::UNAUTHORIZED),
     }
