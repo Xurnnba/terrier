@@ -17,10 +17,10 @@ export const ROUTE_PERMISSIONS: Record<string, Role[]> = {
 	"/messages": ["admin", "organizer", "judge", "sponsor", "participant"],
 	"/judging": ["admin", "organizer", "judge", "sponsor"],
 	"/results": ["admin", "organizer", "judge", "sponsor"],
-	"/submission": ["participant"],
+	"/submission": ["admin", "participant"],
 	"/check-in": ["admin", "organizer", "participant"],
 	"/profile": ["admin", "organizer", "judge", "sponsor", "participant"],
-	"/application": ["applicant"],
+	"/application": ["admin", "applicant"],
 };
 
 export const HOME_ROUTES: Record<Role, string> = {
