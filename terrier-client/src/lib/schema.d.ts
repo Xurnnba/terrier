@@ -55,28 +55,68 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	"/hackathons": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** List all active hackathons */
+		get: operations["list_hackathons"];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/hackathons/{slug}/role": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get user's role for a specific hackathon */
+		get: operations["get_user_role"];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 }
 export type webhooks = Record<string, never>;
 export interface components {
 	schemas: {
+		HackathonInfo: {
+			description?: string | null;
+			/** Format: date-time */
+			end_date: string;
+			/** Format: int32 */
+			id: number;
+			is_active: boolean;
+			name: string;
+			slug: string;
+			/** Format: date-time */
+			start_date: string;
+		};
 		LoginQuery: {
 			redirect_uri?: string | null;
 		};
-		Model: {
-			/** Format: date-time */
-			created_at: string;
+		UserInfo: {
 			email: string;
-			family_name?: string | null;
-			given_name?: string | null;
-			/** Format: int32 */
-			id: number;
+			id: string;
+			is_admin: boolean;
 			name?: string | null;
-			oidc_issuer: string;
-			oidc_sub: string;
 			picture?: string | null;
+		};
+		UserRoleResponse: {
 			role: string;
-			/** Format: date-time */
-			updated_at: string;
 		};
 	};
 	responses: never;
@@ -141,11 +181,68 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content: {
-					"application/json": components["schemas"]["Model"];
+					"application/json": components["schemas"]["UserInfo"];
 				};
 			};
 			/** @description Not authenticated */
 			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	list_hackathons: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description List of active hackathons */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					"application/json": components["schemas"]["HackathonInfo"][];
+				};
+			};
+		};
+	};
+	get_user_role: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description Hackathon slug */
+				slug: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description User's role in this hackathon */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					"application/json": components["schemas"]["UserRoleResponse"];
+				};
+			};
+			/** @description No access to this hackathon */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Hackathon not found */
+			404: {
 				headers: {
 					[name: string]: unknown;
 				};

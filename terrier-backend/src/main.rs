@@ -21,6 +21,7 @@ mod auth;
 mod config;
 mod docs;
 mod entities;
+mod hackathons;
 
 use config::Config;
 use docs::ApiDoc;
@@ -67,6 +68,10 @@ pub async fn create_app(app_state: AppState) -> Result<Router, BoxError> {
 
     let router = Router::new()
         // Protected routes
+        .route(
+            "/api/hackathons/{slug}/role",
+            get(hackathons::handlers::get_user_role),
+        )
         .route("/api/auth/login", get(auth::handlers::login))
         .route("/api/auth/logout", get(auth::handlers::logout))
         // OIDC authentication layer
@@ -76,6 +81,10 @@ pub async fn create_app(app_state: AppState) -> Result<Router, BoxError> {
         ))
         .layer(oidc_login_service)
         // Public routes
+        .route(
+            "/api/hackathons",
+            get(hackathons::handlers::list_hackathons),
+        )
         .route("/api/auth/status", get(auth::handlers::status))
         .route(
             "/api/auth/callback",

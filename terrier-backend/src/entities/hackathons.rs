@@ -6,19 +6,18 @@ use serde::{Deserialize, Serialize};
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize, utoipa :: ToSchema,
 )]
-#[sea_orm(table_name = "users")]
+#[sea_orm(table_name = "hackathons")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
+    pub name: String,
     #[sea_orm(unique)]
-    pub oidc_sub: String,
-    pub email: String,
-    pub name: Option<String>,
-    pub given_name: Option<String>,
-    pub family_name: Option<String>,
+    pub slug: String,
     #[sea_orm(column_type = "Text", nullable)]
-    pub picture: Option<String>,
-    pub oidc_issuer: String,
+    pub description: Option<String>,
+    pub start_date: DateTime,
+    pub end_date: DateTime,
+    pub is_active: bool,
     pub created_at: DateTime,
     pub updated_at: DateTime,
 }

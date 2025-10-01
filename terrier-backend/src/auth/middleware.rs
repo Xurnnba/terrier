@@ -24,13 +24,6 @@ pub async fn sync_user_middleware(
         .flatten();
 
     if user.is_none() {
-        // Determine if this is an admin
-        let role = if state.config.admin_emails.contains(&email.to_lowercase()) {
-            "admin"
-        } else {
-            "applicant"
-        };
-
         // Create new user
         let new_user = users::ActiveModel {
             oidc_sub: Set(oidc_sub),
@@ -52,7 +45,6 @@ pub async fn sync_user_middleware(
                 .and_then(|p| p.get(None))
                 .map(|s| s.to_string())),
             oidc_issuer: Set(claims.issuer().to_string()),
-            role: Set(role.to_string()),
             ..Default::default()
         };
 

@@ -6,7 +6,7 @@ use axum::{
 };
 use axum_oidc::{EmptyAdditionalClaims, OidcClaims, OidcRpInitiatedLogout};
 use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use crate::{
@@ -14,12 +14,21 @@ use crate::{
     entities::{prelude::*, users},
 };
 
+#[derive(Serialize, ToSchema)]
+pub struct UserInfo {
+    id: String,
+    email: String,
+    name: Option<String>,
+    picture: Option<String>,
+    is_admin: bool,
+}
+
 /// Get current user information
 #[utoipa::path(
     get,
     path = "/auth/status",
     responses(
-        (status = 200, description = "User information", body = users::Model),
+        (status = 200, description = "User information", body = UserInfo),
         (status = 401, description = "Not authenticated")
     ),
     tag = "Authentication"
@@ -28,9 +37,17 @@ use crate::{
 pub async fn status(
     State(state): State<AppState>,
     claims: Option<OidcClaims<EmptyAdditionalClaims>>,
-) -> Result<Json<users::Model>, StatusCode> {
+) -> Result<Json<UserInfo>, StatusCode> {
     match claims {
         Some(claims) => {
+            let email = claims
+                .0
+                .email()
+                .map(|s| s.to_string())
+                .ok_or(StatusCode::UNAUTHORIZED)?;
+
+            let is_admin = state.config.admin_emails.contains(&email.to_lowercase());
+
             let oidc_sub = claims.0.subject().to_string();
             let user = Users::find()
                 .filter(users::Column::OidcSub.eq(&oidc_sub))
@@ -39,7 +56,16 @@ pub async fn status(
                 .ok()
                 .flatten();
 
-            user.map(Json).ok_or(StatusCode::UNAUTHORIZED)
+            user.map(|user| {
+                Json(UserInfo {
+                    id: user.id.to_string(),
+                    email: user.email,
+                    name: user.name,
+                    picture: user.picture,
+                    is_admin,
+                })
+            })
+            .ok_or(StatusCode::UNAUTHORIZED)
         }
         None => Err(StatusCode::UNAUTHORIZED),
     }

@@ -9,6 +9,7 @@ export const ROLES = {
 
 export type Role = (typeof ROLES)[keyof typeof ROLES];
 
+// Routes without the /h/[hackathonId] prefix
 export const ROUTE_PERMISSIONS: Record<string, Role[]> = {
 	"/dashboard": ["admin", "organizer", "judge", "sponsor", "participant"],
 	"/configuration": ["admin"],
@@ -32,9 +33,27 @@ export const HOME_ROUTES: Record<Role, string> = {
 	applicant: "/application",
 };
 
+// Remove /h/[hackathonId] prefix
+export function extractRoutePath(fullPath: string): string {
+	const match = fullPath.match(/^\/h\/[^/]+(\/.*)/);
+	if (match) {
+		return match[1];
+	}
+
+	// Not a hackathon route, return as-is
+	return fullPath;
+}
+
 export function canAccessRoute(userRole: string, route: string): boolean {
-	const allowedRoles = ROUTE_PERMISSIONS[route];
+	const routePath = extractRoutePath(route);
+	const allowedRoles = ROUTE_PERMISSIONS[routePath];
 	if (!allowedRoles) return true;
 
 	return allowedRoles.includes(userRole as Role);
+}
+
+// Get the home route for a role within a specific hackathon
+export function getHomeRoute(userRole: string, hackathonId: string): string {
+	const baseRoute = HOME_ROUTES[userRole as Role] || "/dashboard";
+	return `/h/${hackathonId}${baseRoute}`;
 }

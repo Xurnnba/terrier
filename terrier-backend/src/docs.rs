@@ -6,7 +6,7 @@ use utoipa::{
     },
 };
 
-use crate::{auth, entities};
+use crate::{auth, hackathons};
 
 #[derive(OpenApi)]
 #[openapi(
@@ -14,13 +14,18 @@ use crate::{auth, entities};
         auth::handlers::status,
         auth::handlers::login,
         auth::handlers::logout,
+        hackathons::handlers::list_hackathons,
+        hackathons::handlers::get_user_role,
     ),
     components(schemas(
         auth::handlers::LoginQuery,
-        entities::users::Model,
+        auth::handlers::UserInfo,
+        hackathons::handlers::HackathonInfo,
+        hackathons::handlers::UserRoleResponse,
     )),
     modifiers(&SecurityAddon),
     tags(
+        (name = "Hackathons", description = "Hackathon endpoints"),
         (name = "Authentication", description = "Authentication endpoints")
     ),
     info(
