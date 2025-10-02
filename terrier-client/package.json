@@ -16,7 +16,7 @@
         "prepare": "cd .. && husky",
         "preinstall": "npx only-allow bun"
     },
-    "packageManager": "bun@1.2.22",
+    "packageManager": "bun@1.2.23",
     "license": "(MIT OR Apache-2.0)",
     "commitlint": {
         "extends": [
@@ -35,9 +35,11 @@
     },
     "dependencies": {
         "@tailwindcss/vite": "^4.1.13",
+        "@tanstack/svelte-form": "^1.23.5",
         "@tauri-apps/api": "^2.8.0",
         "@tauri-apps/plugin-opener": "^2.5.0",
         "@untitled-theme/icons-svelte": "^0.14.2",
+        "bits-ui": "^2.11.4",
         "openapi-fetch": "^0.14.0",
         "tailwindcss": "^4.1.13"
     },

@@ -1,14 +1,18 @@
 <script lang="ts">
     import ScottyLabsFilled from "@/components/icons/ScottyLabs_filled.svelte";
     import { client } from "@/lib/api";
-    import { LogOut01Icon } from "@untitled-theme/icons-svelte";
+    import { getAuthContext } from "@/lib/auth.svelte";
+    import { PlusIcon } from "@untitled-theme/icons-svelte";
     import { onMount } from "svelte";
+
+    const auth = getAuthContext();
 
     let hackathons = $state<any[]>([]);
     let isLoading = $state(true);
+    let showCreateDialog = $state(false);
 
     onMount(async () => {
-        const { data, response } = await client.GET("/hackathons");
+        const { data, response } = await client.GET("/hackathons/public");
 
         if (data && response.ok) {
             hackathons = data;
@@ -17,54 +21,46 @@
         isLoading = false;
     });
 
-    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
-    const logout = () => {
-        window.location.href = `${apiUrl}/auth/logout`;
+    const create = () => {
+        showCreateDialog = true;
     };
 </script>
 
-<div class="min-h-screen bg-secondary text-selected flex">
-    <aside
-        class="w-64 h-[calc(100vh-3.5rem)] mt-7 ml-7 p-4 rounded-4xl shadow-lg bg-primary"
-    >
-        <a href="/" class="mt-6 justify-center gap-2 flex">
+<div class="min-h-screen bg-secondary text-selected flex flex-col">
+    <div class="m-7 mr-auto">
+        <a href="/" class="gap-2 flex">
             <ScottyLabsFilled class="my-auto" />
             <span class="text-2xl font-medium">Terrier</span>
         </a>
+    </div>
 
-        <nav class="flex mt-8 flex-col gap-1">
+    <main class="mx-7">
+        {#if auth.user?.is_admin}
             <button
-                type="submit"
-                onclick={logout}
-                class="flex cursor-pointer gap-2.5 px-3 py-2 rounded-4xl text-selected"
+                onclick={create}
+                class="bg-selected text-primary cursor-pointer font-semibold px-5 py-3.5 flex gap-2 rounded-4xl mb-6"
             >
-                <LogOut01Icon class="my-auto size-5" />
-                <span class="font-medium">Logout</span>
+                <PlusIcon class="text-primary" />
+                <span>New Hackathon</span>
             </button>
-        </nav>
-    </aside>
+        {/if}
 
-    <main class="flex-1 p-7 overflow-y-auto">
-        <div class="w-full flex flex-col items-center gap-5 mt-10">
-            <h1 class="text-2xl">Select a Hackathon</h1>
-
+        <div class="w-full flex flex-col gap-5">
             {#if isLoading}
                 <p class="text-center">Loading hackathons...</p>
             {:else if hackathons.length === 0}
-                <div class="text-center">
-                    <p class="text-gray-600 mb-4">No hackathons available</p>
-                </div>
+                <p class="text-center">No hackathons found.</p>
             {:else}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div
+                    class="grid grid-cols-auto gap-4 [grid-template-columns:repeat(auto-fill,minmax(16rem,16rem))]"
+                >
                     {#each hackathons as hackathon}
                         <a
                             href="/h/{hackathon.slug}/dashboard"
-                            class="block p-6 bg-primary rounded-lg shadow hover:shadow-lg transition-shadow"
+                            class="size-64 p-6 bg-primary rounded-lg shadow-sm hover:shadow-md duration-250 transition-shadow"
                         >
-                            <h2 class="text-2xl font-bold mb-2">
-                                {hackathon.name}
-                            </h2>
-                            <p class="text-gray-600 mb-4">
+                            <h2 class="text-2xl font-bold">{hackathon.name}</h2>
+                            <p class="text-gray-600">
                                 {hackathon.description || "No description"}
                             </p>
                         </a>

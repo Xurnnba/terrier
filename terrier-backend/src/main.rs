@@ -90,8 +90,8 @@ pub async fn create_app(app_state: AppState) -> Result<Router, BoxError> {
         .layer(oidc_login_service)
         // Public routes
         .route(
-            "/api/hackathons",
-            get(hackathons::handlers::list_hackathons),
+            "/api/hackathons/public",
+            get(hackathons::handlers::list_public_hackathons),
         )
         .route("/api/auth/status", get(auth::handlers::status))
         .route(

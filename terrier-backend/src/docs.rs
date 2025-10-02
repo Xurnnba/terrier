@@ -14,7 +14,7 @@ use crate::{auth, hackathons};
         auth::handlers::status,
         auth::handlers::login,
         auth::handlers::logout,
-        hackathons::handlers::list_hackathons,
+        hackathons::handlers::list_public_hackathons,
         hackathons::handlers::get_user_role,
         hackathons::handlers::create_hackathon,
     ),

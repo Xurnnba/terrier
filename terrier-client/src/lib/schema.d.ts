@@ -62,11 +62,27 @@ export interface paths {
 			path?: never;
 			cookie?: never;
 		};
-		/** List all active hackathons */
-		get: operations["list_hackathons"];
+		get?: never;
 		put?: never;
-		/** Create a new hackathon (global admin only) */
+		/** Create a new hackathon */
 		post: operations["create_hackathon"];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/hackathons/public": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** List all active hackathons */
+		get: operations["list_public_hackathons"];
+		put?: never;
+		post?: never;
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -109,7 +125,6 @@ export interface components {
 			end_date: string;
 			/** Format: int32 */
 			id: number;
-			is_active: boolean;
 			name: string;
 			slug: string;
 			/** Format: date-time */
@@ -203,26 +218,6 @@ export interface operations {
 			};
 		};
 	};
-	list_hackathons: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description List of active hackathons */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					"application/json": components["schemas"]["HackathonInfo"][];
-				};
-			};
-		};
-	};
 	create_hackathon: {
 		parameters: {
 			query?: never;
@@ -265,6 +260,26 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content?: never;
+			};
+		};
+	};
+	list_public_hackathons: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description List of active hackathons */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					"application/json": components["schemas"]["HackathonInfo"][];
+				};
 			};
 		};
 	};

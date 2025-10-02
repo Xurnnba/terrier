@@ -3,9 +3,13 @@
     import { page } from "$app/state";
     import "@/app.css";
     import { client } from "@/lib/api";
-    import { setAuthContext, setHackathonContext } from "@/lib/auth.svelte";
+    import {
+        getAuthContext,
+        login,
+        logout,
+        setHackathonContext,
+    } from "@/lib/auth.svelte";
     import { canAccessRoute } from "@/lib/permissions";
-    import { onMount } from "svelte";
 
     import ErrorPage from "@/components/error-page.svelte";
     import ScottyLabsFilled from "@/components/icons/ScottyLabs_filled.svelte";
@@ -27,14 +31,66 @@
     const { children } = $props();
     const hackathonId = $derived(page.params.hackathonId)!;
 
-    const auth = setAuthContext();
+    const auth = getAuthContext();
     const hackathon = setHackathonContext();
+    const currentPath = $derived(page.url.pathname);
 
+    // Update hackathonId in context when it changes
     $effect(() => {
         hackathon.hackathonId = hackathonId;
     });
 
     let errorState = $state<{ status: number; message: string } | null>(null);
+    let roleChecked = $state(false);
+
+    // React to auth changes
+    $effect(() => {
+        if (!auth.isLoading && !roleChecked) {
+            checkHackathonAccess();
+        }
+    });
+
+    async function checkHackathonAccess() {
+        if (!auth.user) {
+            return login(currentPath);
+        }
+
+        const { data: roleData, response: roleResponse } = await client.GET(
+            "/hackathons/{slug}/role",
+            { params: { path: { slug: hackathonId } } },
+        );
+
+        if (roleData && roleResponse.ok) {
+            hackathon.hackathonRole = roleData.role;
+            hackathon.hackathonId = hackathonId;
+
+            // Check if user can access current route
+            if (!canAccessRoute(hackathon.hackathonRole, currentPath)) {
+                const firstAccessible = allNavItems.find((item) =>
+                    canAccessRoute(hackathon.hackathonRole!, item.href),
+                );
+
+                if (firstAccessible) {
+                    goto(firstAccessible.href);
+                } else {
+                    errorState = {
+                        status: 403,
+                        message: "You do not have access to this hackathon",
+                    };
+                }
+            }
+        } else {
+            errorState = {
+                status: roleResponse.status === 404 ? 404 : 403,
+                message:
+                    roleResponse.status === 404
+                        ? "Hackathon not found"
+                        : "You do not have access to this hackathon",
+            };
+        }
+
+        roleChecked = true;
+    }
 
     const allNavItems = $derived([
         {
@@ -101,67 +157,6 @@
               )
             : [],
     );
-
-    const currentPath = $derived(page.url.pathname);
-    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
-
-    onMount(async () => {
-        const { data, response } = await client.GET("/auth/status");
-
-        if (data && response.ok) {
-            auth.user = data;
-
-            // Fetch user's role for this specific hackathon
-            const { data: roleData, response: roleResponse } = await client.GET(
-                "/hackathons/{slug}/role",
-                {
-                    params: { path: { slug: hackathonId } },
-                },
-            );
-
-            if (roleData && roleResponse.ok) {
-                hackathon.hackathonRole = roleData.role;
-            } else {
-                // User doesn't have access to this hackathon
-                auth.isLoading = false;
-                errorState = {
-                    status: roleResponse.status === 404 ? 404 : 403,
-                    message:
-                        roleResponse.status === 404
-                            ? "Hackathon not found"
-                            : "You do not have access to this hackathon",
-                };
-                return;
-            }
-
-            auth.isLoading = false;
-
-            // Check if user can access current route
-            if (!canAccessRoute(hackathon.hackathonRole!, currentPath)) {
-                const firstAccessible = allNavItems.find((item) =>
-                    canAccessRoute(hackathon.hackathonRole!, item.href),
-                );
-
-                if (firstAccessible) {
-                    goto(firstAccessible.href);
-                } else {
-                    errorState = {
-                        status: 403,
-                        message: "You do not have access to this hackathon",
-                    };
-                }
-            }
-        } else {
-            const appUrl = window.location.origin;
-            const encodedUri = encodeURIComponent(`${appUrl}${currentPath}`);
-
-            window.location.href = `${apiUrl}/auth/login?redirect_uri=${encodedUri}`;
-        }
-    });
-
-    const logout = () => {
-        window.location.href = `${apiUrl}/auth/logout`;
-    };
 </script>
 
 {#if errorState}

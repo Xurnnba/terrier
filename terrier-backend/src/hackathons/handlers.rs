@@ -18,19 +18,18 @@ pub struct HackathonInfo {
     pub description: Option<String>,
     pub start_date: NaiveDateTime,
     pub end_date: NaiveDateTime,
-    pub is_active: bool,
 }
 
 /// List all active hackathons
 #[utoipa::path(
     get,
-    path = "/hackathons",
+    path = "/hackathons/public",
     responses(
         (status = 200, description = "List of active hackathons", body = Vec<HackathonInfo>)
     ),
     tag = "Hackathons"
 )]
-pub async fn list_hackathons(
+pub async fn list_public_hackathons(
     State(state): State<AppState>,
 ) -> Result<Json<Vec<HackathonInfo>>, StatusCode> {
     let hackathons = Hackathons::find()
@@ -49,7 +48,6 @@ pub async fn list_hackathons(
                 description: h.description,
                 start_date: h.start_date,
                 end_date: h.end_date,
-                is_active: h.is_active,
             })
             .collect(),
     ))
@@ -142,7 +140,6 @@ pub async fn create_hackathon(
             description: result.description,
             start_date: result.start_date,
             end_date: result.end_date,
-            is_active: result.is_active,
         }),
     ))
 }
