@@ -26,12 +26,13 @@ Follow the instructions printed by the setup script to finish configuring `.env`
 
 - Add your email to `ADMIN_EMAILS` (comma-separated)
 - Set the OIDC credentials
+- Update APP_URL and API_URL to your production URLs
 
 ### 3. Start
 
 ```bash
-just start   # Runs migrations and starts services
-just logs    # View logs
+just start         # Runs migrations and starts services
+just logs          # View logs
 ```
 
 ## Setting Up OIDC Providers
