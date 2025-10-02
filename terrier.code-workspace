@@ -18,6 +18,7 @@
             "tauri-apps.tauri-vscode",
             "svelte.svelte-vscode",
             "bradlc.vscode-tailwindcss",
+            "tamasfe.even-better-toml",
             "rust-lang.rust-analyzer",
             "oxc.oxc-vscode",
             "biomejs.biome"

@@ -43,7 +43,8 @@ services:
             postgres:
                 condition: service_healthy
         command: ["migration"] # Runs all pending migrations
-        profiles: ["migration"]
+        profiles:
+            - migration
 
     minio:
         container_name: minio
