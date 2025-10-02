@@ -10,7 +10,15 @@ cleanup() {
 
 trap cleanup SIGINT SIGTERM
 
-ROOT_DIR=$(pwd)
+ROOT_DIR=$(dirname "$(dirname "$(realpath "$0")")")
+cd "$ROOT_DIR"
+
+if [ ! -f ".env" ]; then
+    echo ".env file not found, running setup script..."
+    ./scripts/setup.sh --dev
+    echo "Run the dev script again when you've finished configuring the environment"
+    exit 0
+fi
 
 # Start Docker services
 docker-compose up -d postgres minio pgadmin nginx-dev

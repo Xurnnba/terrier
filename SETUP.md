@@ -1,5 +1,7 @@
 # Setup
 
+The following instructions are for setting up Terrier in production. For local development, see the [README](README.md).
+
 ## Prerequisites
 
 - **Docker**
@@ -14,23 +16,21 @@
 git clone https://github.com/ScottyLabs/terrier.git
 cd terrier
 
-# Copy environment template
-cp .env.example .env
+# Initialize .env file
+./scripts/setup.sh
 ```
 
 ### 2. Configure
 
-```bash
-# Generate secure passwords for PosgreSQL, pgAdmin, and MinIO
-python3 -c "import secrets; print(secrets.token_urlsafe(32))"
-```
+Follow the instructions printed by the setup script to finish configuring `.env`:
 
-Modify `.env` with these values, your OIDC credentials, and admin emails (comma-separated).
+- Add your email to `ADMIN_EMAILS` (comma-separated)
+- Set the OIDC credentials
 
 ### 3. Start
 
 ```bash
-just setup   # Runs migrations and starts services
+just start   # Runs migrations and starts services
 just logs    # View logs
 ```
 
@@ -40,23 +40,25 @@ Most OIDC providers follow similar patterns. You need:
 
 - Client ID and Secret
 - Issuer URL
-- Callback URL pointing to the backend (`/api/auth/callback`)
+
+On your OIDC provider, add the callback URL on your backend (ending in `/api/auth/callback`) as an authorized redirect URI.
 
 ## Available Commands
 
 ```bash
-just build   # Build all services
-just clean   # Remove all containers, volumes, and images
-just dev     # Start supporting services, run migrations, and launch apps locally
-just down    # Stop all services
-just fresh   # Fresh database (drop all tables and reapply migrations)
-just help    # Show this help message
-just logs    # Show logs for all services
-just migrate # Run database migrations
-just restart # Restart all services
-just setup   # Run migrations and start services
-just status  # Check migration status
-just up      # Start all services
+just build         # Build all services
+just clean         # Remove all containers, volumes, and images
+just dev           # Start supporting services, run migrations, and launch apps locally
+just down          # Stop all services
+just fresh         # Fresh database (drop all tables and reapply migrations)
+just help          # Show this help message
+just logs          # Show logs for all services
+just migrate       # Run database migrations
+just restart       # Restart all services
+just restart-build # Restart with rebuild (for code changes)
+just start         # Run migrations and start services
+just status        # Check migration status
+just up            # Start all services
 ```
 
 ## Configuration

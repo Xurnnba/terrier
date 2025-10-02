@@ -2,28 +2,16 @@
 
 ## Getting started
 
-See [SETUP.md](./SETUP.md) for instructions on how to host Terrier.
+See [SETUP.md](./SETUP.md) for instructions on how to host Terrier in production.
 
 ## Development
 
-1. First, copy the environment variables to `.env`. You may want to customize some of these for development:
+This project uses `just`, a make-like command runner. After [installing it](https://github.com/casey/just?tab=readme-ov-file#packages), you can use the following command to start the application in development mode:
 
-    ```bash
-    # Application Configuration
-    APP_URL=http://localhost:8080
-    API_URL=http://localhost:8080/api
+```bash
+just dev
+```
 
-    # For local development
-    DATABASE_URL=postgres://terrier:secure_password@localhost:5432/terrier
+The first time you run this, it will also run the setup script to initialize the `.env` file. You will need to fill in the OIDC credentials and admin emails in this file before starting the dev server again.
 
-    # Admin Configuration
-    RUST_LOG=debug
-    ```
-
-2. This project uses `just`, a make-like command runner. After [installing it](https://github.com/casey/just?tab=readme-ov-file#packages), you can use the following command to start the application in development mode:
-
-    ```bash
-    just dev
-    ```
-
-    Then visit [http://localhost:8080](http://localhost:8080) in the browser.
+Afterward, it will start the supporting services (PostgreSQL, MinIO, pgAdmin, and nginx) and launch the frontend and backend applications. The frontend will be available at [http://localhost:8080](http://localhost:8080) and the backend at [http://localhost:8080/api](http://localhost:8080/api).

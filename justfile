@@ -43,7 +43,7 @@ restart: down up
 restart-build: down build up
 
 # Run migrations and start services
-setup: migrate up
+start: migrate up
 
 # Start supporting services, run migrations, and launch apps locally
 dev:
