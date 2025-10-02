@@ -16,12 +16,14 @@ use crate::{auth, hackathons};
         auth::handlers::logout,
         hackathons::handlers::list_hackathons,
         hackathons::handlers::get_user_role,
+        hackathons::handlers::create_hackathon,
     ),
     components(schemas(
         auth::handlers::LoginQuery,
         auth::handlers::UserInfo,
         hackathons::handlers::HackathonInfo,
         hackathons::handlers::UserRoleResponse,
+        hackathons::handlers::CreateHackathonRequest,
     )),
     modifiers(&SecurityAddon),
     tags(

@@ -65,7 +65,8 @@ export interface paths {
 		/** List all active hackathons */
 		get: operations["list_hackathons"];
 		put?: never;
-		post?: never;
+		/** Create a new hackathon (global admin only) */
+		post: operations["create_hackathon"];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -93,6 +94,15 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
 	schemas: {
+		CreateHackathonRequest: {
+			description?: string | null;
+			/** Format: date-time */
+			end_date: string;
+			name: string;
+			slug: string;
+			/** Format: date-time */
+			start_date: string;
+		};
 		HackathonInfo: {
 			description?: string | null;
 			/** Format: date-time */
@@ -213,6 +223,51 @@ export interface operations {
 			};
 		};
 	};
+	create_hackathon: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				"application/json": components["schemas"]["CreateHackathonRequest"];
+			};
+		};
+		responses: {
+			/** @description Hackathon created successfully */
+			201: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					"application/json": components["schemas"]["HackathonInfo"];
+				};
+			};
+			/** @description Invalid request or slug already exists */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Not authenticated */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Not a global admin */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
 	get_user_role: {
 		parameters: {
 			query?: never;
@@ -233,6 +288,13 @@ export interface operations {
 				content: {
 					"application/json": components["schemas"]["UserRoleResponse"];
 				};
+			};
+			/** @description Not authenticated */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
 			};
 			/** @description No access to this hackathon */
 			403: {

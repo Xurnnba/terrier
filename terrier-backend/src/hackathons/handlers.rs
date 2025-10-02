@@ -1,17 +1,13 @@
-use axum::{
-    Json,
-    extract::{Path, State},
-    http::StatusCode,
-};
-use axum_oidc::{EmptyAdditionalClaims, OidcClaims};
+use axum::{Json, extract::State, http::StatusCode};
 use chrono::NaiveDateTime;
-use sea_orm::{ColumnTrait, EntityTrait, JoinType, QueryFilter, QuerySelect, RelationTrait};
-use serde::Serialize;
+use sea_orm::{ActiveModelTrait, ActiveValue::Set, ColumnTrait, EntityTrait, QueryFilter};
+use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use crate::{
     AppState,
-    entities::{hackathons, prelude::*, user_hackathon_roles, users},
+    auth::extractors::{HackathonRole, RequireGlobalAdmin},
+    entities::{hackathons, prelude::*},
 };
 
 #[derive(Serialize, ToSchema)]
@@ -79,54 +75,74 @@ pub struct UserRoleResponse {
     ),
     tag = "Hackathons"
 )]
-pub async fn get_user_role(
-    claims: OidcClaims<EmptyAdditionalClaims>,
+pub async fn get_user_role(role: HackathonRole) -> Result<Json<UserRoleResponse>, StatusCode> {
+    Ok(Json(UserRoleResponse { role: role.role }))
+}
+
+#[derive(Deserialize, ToSchema)]
+pub struct CreateHackathonRequest {
+    pub name: String,
+    pub slug: String,
+    pub description: Option<String>,
+    pub start_date: NaiveDateTime,
+    pub end_date: NaiveDateTime,
+}
+
+/// Create a new hackathon
+#[utoipa::path(
+    post,
+    path = "/hackathons",
+    request_body = CreateHackathonRequest,
+    responses(
+        (status = 201, description = "Hackathon created successfully", body = HackathonInfo),
+        (status = 400, description = "Invalid request or slug already exists"),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Not a global admin"),
+    ),
+    tag = "Hackathons"
+)]
+pub async fn create_hackathon(
+    _admin: RequireGlobalAdmin,
     State(state): State<AppState>,
-    Path(slug): Path<String>,
-) -> Result<Json<UserRoleResponse>, StatusCode> {
-    let oidc_sub = claims.subject().to_string();
-    let email = claims.email().map(|e| e.to_string()).unwrap_or_default();
-
-    // Verify hackathon exists
-    let hackathon_exists = Hackathons::find()
-        .filter(hackathons::Column::Slug.eq(&slug))
-        .one(&state.db)
-        .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
-        .is_some();
-
-    if !hackathon_exists {
-        return Err(StatusCode::NOT_FOUND);
-    }
-
-    // Check if global admin
-    if state.config.admin_emails.contains(&email.to_lowercase()) {
-        return Ok(Json(UserRoleResponse {
-            role: "admin".to_string(),
-        }));
-    }
-
-    // Get user role for the hackathon
-    let role = UserHackathonRoles::find()
-        .select_only()
-        .column(user_hackathon_roles::Column::Role)
-        .join(
-            JoinType::InnerJoin,
-            user_hackathon_roles::Relation::Users.def(),
-        )
-        .join(
-            JoinType::InnerJoin,
-            user_hackathon_roles::Relation::Hackathons.def(),
-        )
-        .filter(users::Column::OidcSub.eq(oidc_sub))
-        .filter(hackathons::Column::Slug.eq(slug))
-        .into_tuple::<String>()
+    Json(req): Json<CreateHackathonRequest>,
+) -> Result<(StatusCode, Json<HackathonInfo>), StatusCode> {
+    // Check if slug already exists
+    let existing = Hackathons::find()
+        .filter(hackathons::Column::Slug.eq(&req.slug))
         .one(&state.db)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    match role {
-        Some(role) => Ok(Json(UserRoleResponse { role })),
-        None => Err(StatusCode::FORBIDDEN),
+    if existing.is_some() {
+        return Err(StatusCode::BAD_REQUEST);
     }
+
+    // Create hackathon
+    let hackathon = hackathons::ActiveModel {
+        name: Set(req.name),
+        slug: Set(req.slug),
+        description: Set(req.description),
+        start_date: Set(req.start_date),
+        end_date: Set(req.end_date),
+        is_active: Set(false),
+        ..Default::default()
+    };
+
+    let result = hackathon
+        .insert(&state.db)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    Ok((
+        StatusCode::CREATED,
+        Json(HackathonInfo {
+            id: result.id,
+            name: result.name,
+            slug: result.slug,
+            description: result.description,
+            start_date: result.start_date,
+            end_date: result.end_date,
+            is_active: result.is_active,
+        }),
+    ))
 }

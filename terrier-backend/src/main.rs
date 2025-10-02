@@ -1,6 +1,10 @@
 use axum::{
-    BoxError, Router, error_handling::HandleErrorLayer, http::Uri, middleware,
-    response::IntoResponse, routing::get,
+    BoxError, Router,
+    error_handling::HandleErrorLayer,
+    http::Uri,
+    middleware,
+    response::IntoResponse,
+    routing::{get, post},
 };
 use axum_oidc::{
     EmptyAdditionalClaims, OidcAuthLayer, OidcClient, OidcLoginLayer, error::MiddlewareError,
@@ -71,6 +75,10 @@ pub async fn create_app(app_state: AppState) -> Result<Router, BoxError> {
         .route(
             "/api/hackathons/{slug}/role",
             get(hackathons::handlers::get_user_role),
+        )
+        .route(
+            "/api/hackathons",
+            post(hackathons::handlers::create_hackathon),
         )
         .route("/api/auth/login", get(auth::handlers::login))
         .route("/api/auth/logout", get(auth::handlers::logout))
